@@ -50,12 +50,16 @@ export default {
       from: "wrdo <support@wr.do>",
       async sendVerificationRequest({ identifier: email, url, provider }) {
         try {
-          const { error } = await resend.emails.send({
+          // 处理模拟 Resend 客户端和实际 Resend 客户端返回的不同结构
+          const result = await resend.emails.send({
             from: provider.from || "no-reply@wr.do",
             to: [email],
             subject: "Verify your email address",
             html: getVerificationEmailHtml({ url, appName: siteConfig.name }),
           });
+          
+          // 检查是否有错误（兼容两种返回结构）
+          const error = 'error' in result ? result.error : null;
 
           if (error) {
             throw new Error(`Resend error: ${JSON.stringify(error)}`);

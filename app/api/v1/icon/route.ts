@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import Icon from "lucide-static";
+// 修复导入错误，将默认导入改为命名空间导入
+import * as Icon from "lucide-static";
 
 import { toCamelCase } from "@/lib/utils";
 
