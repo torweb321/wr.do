@@ -2,7 +2,14 @@ import { Resend } from "resend";
 
 import { env } from "@/env.mjs";
 
-export const resend = new Resend(env.RESEND_API_KEY);
+// 创建一个模拟的 Resend 客户端，用于禁用邮件功能
+export const resend = process.env.SKIP_EMAIL_INIT === "true"
+  ? {
+      emails: {
+        send: async () => ({ id: "mock-email-id", data: null }),
+      },
+    }
+  : new Resend(env.RESEND_API_KEY || "dummy_key");
 
 export function getVerificationEmailHtml({
   url,
