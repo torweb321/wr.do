@@ -33,12 +33,16 @@ export async function POST(req: NextRequest) {
       return NextResponse.json("Invalid email address", { status: 403 });
     }
 
-    const { error } = await resend.emails.send({
+    // 处理模拟 Resend 客户端和实际 Resend 客户端返回的不同结构
+    const result = await resend.emails.send({
       from,
       to,
       subject,
       html,
     });
+    
+    // 检查是否有错误（兼容两种返回结构）
+    const error = 'error' in result ? result.error : null;
 
     if (error) {
       console.log("Resend error:", error);
