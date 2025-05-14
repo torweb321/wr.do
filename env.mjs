@@ -26,8 +26,9 @@ export const env = createEnv({
     NEXT_PUBLIC_APP_URL: z.string().min(1),
     NEXT_PUBLIC_OPEN_SIGNUP: z.string().min(1).default("1"),
     NEXT_PUBLIC_SHORT_DOMAINS: z.string().min(1).default(""),
-    NEXT_PUBLIC_EMAIL_DOMAINS: z.string().min(1).default(""),
-    NEXT_PUBLIC_EMAIL_R2_DOMAIN: z.string().min(1),
+    // 将邮件相关变量设置为可选，以便在禁用邮件功能时不会出错
+    NEXT_PUBLIC_EMAIL_DOMAINS: z.string().default("dummy.com"),
+    NEXT_PUBLIC_EMAIL_R2_DOMAIN: z.string().default("dummy.com"),
   },
   runtimeEnv: {
     NEXTAUTH_URL: process.env.NEXTAUTH_URL,
