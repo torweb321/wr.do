@@ -1,4 +1,4 @@
-// app/api/github-stars/route.ts
+// app/api/github/route.ts
 import { NextRequest, NextResponse } from "next/server";
 
 import { env } from "@/env.mjs";
@@ -25,10 +25,20 @@ export async function GET(request: NextRequest) {
   try {
     const { GITHUB_TOKEN } = env;
 
+    // 如果没有 GitHub token，返回默认值而不是抛出错误
     if (!GITHUB_TOKEN) {
-      throw new Error("GitHub token is not configured");
+      console.warn("GitHub token is not configured, returning default star count");
+      return NextResponse.json(
+        { stargazers_count: 0 },
+        {
+          headers: {
+            "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=86400",
+          },
+        }
+      );
     }
 
+    // 尝试从 GitHub API 获取数据
     const response = await fetch(
       `https://api.github.com/repos/${owner}/${repo}`,
       {
@@ -54,22 +64,20 @@ export async function GET(request: NextRequest) {
     const data: GitHubResponse = await response.json();
 
     return NextResponse.json(
-      { stars: data.stargazers_count },
+      { stargazers_count: data.stargazers_count },
       {
         headers: {
-          "Cache-Control":
-            "public, s-maxage=3600, stale-while-revalidate=86400",
+          "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=86400",
         },
       },
     );
   } catch (error) {
     console.error("GitHub API error:", error);
+    // 出错时返回默认值
     return NextResponse.json(
-      {
-        error:
-          error instanceof Error
-            ? error.message
-            : "Failed to fetch GitHub stars",
+      { 
+        stargazers_count: 0,
+        error: error instanceof Error ? error.message : String(error),
       },
       { status: 500 },
     );
